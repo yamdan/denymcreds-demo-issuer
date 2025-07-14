@@ -94,12 +94,13 @@ const UserPkSection: React.FC<Props> = ({ onUserPkChange, header, t }) => {
             value={jwkInput}
             onChange={(e) => handleInputChange(e.target.value)}
             placeholder={JSON.stringify(defaultJwk, null, 2)}
-            rows={6}
+            rows={8}
+            className="json-input"
             style={{
-              fontFamily: 'monospace',
               fontSize: '14px',
               width: '100%',
-              resize: 'vertical'
+              resize: 'vertical',
+              minHeight: '140px'
             }}
           />
           {error && (

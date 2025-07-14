@@ -20,6 +20,7 @@ const IssuerKeySection: React.FC<Props> = ({ issuerSk, onIssuerSkChange, t }) =>
   const [manualFormat, setManualFormat] = useState<ManualInputFormat>('hex');
   const [manualInput, setManualInput] = useState<string>('0x576e3f0b4ddb5663457b354d70357ecf41a93e2920231ad792342d47ea162c71');
   const [jwk, setJwk] = useState<string>('');
+  const [copyMessage, setCopyMessage] = useState<string>('');
 
   const generateJwkFromSk = useCallback((privateKeyNumbers: number[]) => {
     try {
@@ -88,6 +89,25 @@ const IssuerKeySection: React.FC<Props> = ({ issuerSk, onIssuerSkChange, t }) =>
     onIssuerSkChange(privateKeyNumbers);
     generateJwkFromSk(privateKeyNumbers);
   }, [onIssuerSkChange, generateJwkFromSk]);
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(jwk);
+      setCopyMessage(t.copied);
+      setTimeout(() => setCopyMessage(''), 2000);
+    } catch (error) {
+      console.error('Failed to copy:', error);
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = jwk;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopyMessage(t.copied);
+      setTimeout(() => setCopyMessage(''), 2000);
+    }
+  };
 
   // Set default issuer secret key on component mount
   useEffect(() => {
@@ -175,7 +195,38 @@ const IssuerKeySection: React.FC<Props> = ({ issuerSk, onIssuerSkChange, t }) =>
       {jwk && (
         <div className="jwk-display">
           <label>{t.jwkDisplay}:</label>
-          <pre className="jwk-output">{jwk}</pre>
+          <pre className="jwk-output" style={{ 
+            position: 'relative',
+            boxSizing: 'border-box'
+          }}>
+            {jwk}
+            <button 
+              onClick={copyToClipboard} 
+              className="copy-icon-button"
+              style={{
+                position: 'absolute',
+                top: '10px',
+                right: '10px',
+                background: 'rgba(255, 255, 255, 0.8)',
+                border: '1px solid #ced4da',
+                borderRadius: '4px',
+                padding: '5px 8px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+              title={t.copyToClipboard}
+            >
+              📋
+            </button>
+            {copyMessage && (
+              <span className="copy-message" style={{ position: 'absolute', top: '10px', right: '50px' }}>
+                {copyMessage}
+              </span>
+            )}
+          </pre>
         </div>
       )}
 

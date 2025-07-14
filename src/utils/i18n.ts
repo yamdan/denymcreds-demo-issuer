@@ -74,11 +74,11 @@ const translations: Record<Language, Translations> = {
     subtitle: 'JWP (JSON Web Proof) 風の証明書発行のデモ',
     
     // Sections
-    issuerKeySection: 'Issuer秘密鍵',
+    issuerKeySection: 'Issuer鍵',
     headerSection: 'ヘッダー',
     userPkSection: 'ユーザー公開鍵',
     payloadSection: 'ペイロード',
-    resultSection: '結果',
+    resultSection: '結果 (Issued JWP)',
     
     // Issuer Key Section
     generateRandomKey: 'ランダム生成',
@@ -104,7 +104,7 @@ const translations: Record<Language, Translations> = {
     generateUserPk: '仮名公開鍵生成',
     userPkResult: 'ユーザー公開鍵結果',
     currentUserPk: 'ユーザーの仮名公開鍵',
-    userPkInput: 'ユーザー公開鍵JWK入力',
+    userPkInput: 'JWK入力',
     invalidUserPkJwk: '無効なユーザー公開鍵JWK形式です',
     contextMismatch: 'JWKのコンテキスト(c)がヘッダーのiss値と一致しません',
     
@@ -145,7 +145,7 @@ const translations: Record<Language, Translations> = {
     headerSection: 'Header',
     userPkSection: 'User Public Key',
     payloadSection: 'Payload',
-    resultSection: 'Result',
+    resultSection: 'Result (Issued JWP)',
     
     // Issuer Key Section
     generateRandomKey: 'Random Generation',
@@ -171,7 +171,7 @@ const translations: Record<Language, Translations> = {
     generateUserPk: 'Generate User PK',
     userPkResult: 'User PK Result',
     currentUserPk: 'Current User PK',
-    userPkInput: 'User Public Key JWK Input',
+    userPkInput: 'JWK Input',
     invalidUserPkJwk: 'Invalid User Public Key JWK format',
     contextMismatch: 'JWK context (c) does not match header iss value',
     
