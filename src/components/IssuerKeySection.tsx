@@ -18,7 +18,7 @@ type ManualInputFormat = 'hex' | 'array';
 const IssuerKeySection: React.FC<Props> = ({ issuerSk, onIssuerSkChange, t }) => {
   const [mode, setMode] = useState<KeyInputMode>('manual');
   const [manualFormat, setManualFormat] = useState<ManualInputFormat>('hex');
-  const [manualInput, setManualInput] = useState<string>('0x576e3f0b4ddb566347b92b1a0d13abbbd1a3d40f7f7fc7cc6c9a1d2656c8526a');
+  const [manualInput, setManualInput] = useState<string>('0x576e3f0b4ddb5663457b354d70357ecf41a93e2920231ad792342d47ea162c71');
   const [jwk, setJwk] = useState<string>('');
 
   const generateJwkFromSk = useCallback((privateKeyNumbers: number[]) => {
