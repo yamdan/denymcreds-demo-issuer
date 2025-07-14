@@ -94,6 +94,7 @@ function App() {
           <UserPkSection 
             userPk={userPk}
             onUserPkChange={setUserPk}
+            header={header}
             t={t}
           />
           

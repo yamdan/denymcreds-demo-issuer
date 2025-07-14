@@ -36,6 +36,9 @@ export interface Translations {
   generateUserPk: string;
   userPkResult: string;
   currentUserPk: string;
+  userPkInput: string;
+  invalidUserPkJwk: string;
+  contextMismatch: string;
   
   // Payload Section
   addPair: string;
@@ -101,6 +104,9 @@ const translations: Record<Language, Translations> = {
     generateUserPk: '仮名公開鍵生成',
     userPkResult: 'ユーザー公開鍵結果',
     currentUserPk: 'ユーザーの仮名公開鍵',
+    userPkInput: 'ユーザー公開鍵JWK入力',
+    invalidUserPkJwk: '無効なユーザー公開鍵JWK形式です',
+    contextMismatch: 'JWKのコンテキスト(c)がヘッダーのiss値と一致しません',
     
     // Payload Section
     addPair: 'ペア追加',
@@ -165,6 +171,9 @@ const translations: Record<Language, Translations> = {
     generateUserPk: 'Generate User PK',
     userPkResult: 'User PK Result',
     currentUserPk: 'Current User PK',
+    userPkInput: 'User Public Key JWK Input',
+    invalidUserPkJwk: 'Invalid User Public Key JWK format',
+    contextMismatch: 'JWK context (c) does not match header iss value',
     
     // Payload Section
     addPair: 'Add Pair',

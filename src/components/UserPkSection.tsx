@@ -1,70 +1,87 @@
-import React, { useState, useEffect } from 'react';
-import { genUpk, genUsk, base64urlEncode, type PublicKey } from '../utils/sign';
+import React, { useState, useEffect, useCallback } from 'react';
 import { type Translations } from '../utils/i18n';
 
 interface Props {
   userPk: string;
   onUserPkChange: (userPk: string) => void;
+  header: string;
   t: Translations;
 }
 
-const UserPkSection: React.FC<Props> = ({ userPk, onUserPkChange, t }) => {
-  const [userSk, setUserSk] = useState<string>('0x0a5bce2449b1632f3d1e4f96c095baa811040e17e7a7e84fb5ce8a0cad76f0e6');
-  const [devicePk, setDevicePk] = useState<string>('0x04421b4d7531a4adad4d1d2215af6a35fb6c509c9f54eab216ec6bd2420aff0e76e04f5676847feff5748a47b07b9e5bb3963df79c5d1cb41ab2aed04c0d9ef5a6');
-  const [context, setContext] = useState<string>('https://issuer.example');
+interface UserPkJwk {
+  kty: string;
+  k: string;
+  c: string;
+}
 
-  const userPkJwk = userPk ? JSON.stringify({
-    kty: 'oct',
-    k: userPk,
-  }, null, 2) : '';
+// Default JWK example (moved outside component to avoid recreating on each render)
+const defaultJwk = {
+  kty: "nym",
+  k: "FO0qROb_uMlNMAjLcar9ikfMcEuX30cVBKD5Fgxy710",
+  c: "https://issuer.example"
+};
 
-  const generateRandomUserSk = () => {
-    const randomSk = genUsk();
-    const skHex = `0x${randomSk.toString(16).padStart(64, '0')}`;
-    setUserSk(skHex);
-  };
+const UserPkSection: React.FC<Props> = ({ onUserPkChange, header, t }) => {
+  const [jwkInput, setJwkInput] = useState<string>('');
+  const [error, setError] = useState<string>('');
 
-  const parseHexToNumberArray = (hexString: string): number[] => {
-    const cleanHex = hexString.replace(/^0x/, '');
-    if (cleanHex.length !== 64) {
-      throw new Error('Hex string must be 64 characters (32 bytes)');
+  const validateAndSetUserPk = useCallback((input: string) => {
+    setError('');
+    
+    if (!input.trim()) {
+      onUserPkChange('');
+      return;
     }
-    const numbers: number[] = [];
-    for (let i = 0; i < cleanHex.length; i += 2) {
-      numbers.push(parseInt(cleanHex.substr(i, 2), 16));
-    }
-    return numbers;
-  };
 
-  const generateUserPk = () => {
     try {
-      const pkHex = devicePk.startsWith('0x04') ? devicePk.slice(4) : devicePk.replace(/^0x/, '');
-      const devicePkX = pkHex.slice(0, 64);
-      const devicePkY = pkHex.slice(64, 128);
-      // Parse device public key
-      const devicePkParsed: PublicKey = {
-        x: parseHexToNumberArray(devicePkX),
-        y: parseHexToNumberArray(devicePkY)
-      };
+      const jwk: UserPkJwk = JSON.parse(input);
+      
+      // Validate required fields
+      if (!jwk.kty || !jwk.k || !jwk.c) {
+        setError(t.invalidUserPkJwk);
+        onUserPkChange('');
+        return;
+      }
 
-      // Generate user public key
-      const result = genUpk(userSk, devicePkParsed, context);
+      // Validate kty field
+      if (jwk.kty !== 'nym') {
+        setError(t.invalidUserPkJwk);
+        onUserPkChange('');
+        return;
+      }
 
-      // Convert to base64url format
-      const userPkHex = result.userPk.toString(16).padStart(64, '0');
-      const userPkBytes = new Uint8Array(userPkHex.match(/.{2}/g)!.map(byte => parseInt(byte, 16)));
-      const userPkB64 = base64urlEncode(userPkBytes);
+      // Extract iss from header and validate context match
+      try {
+        const headerObj = JSON.parse(header);
+        if (headerObj.iss && jwk.c !== headerObj.iss) {
+          setError(t.contextMismatch);
+          onUserPkChange('');
+          return;
+        }
+      } catch {
+        // If header is invalid JSON, we can't validate context match
+        // but we can still accept the JWK
+      }
 
-      onUserPkChange(userPkB64);
-    } catch (error) {
-      alert(`Error generating user PK: ${error}`);
+      // All validations passed
+      onUserPkChange(jwk.k);
+    } catch {
+      setError(t.invalidUserPkJwk);
+      onUserPkChange('');
     }
-  };
+  }, [header, onUserPkChange, t.invalidUserPkJwk, t.contextMismatch]);
 
-  // Automatically generate user PK when component mounts
+  // Initialize with default JWK
   useEffect(() => {
-    generateUserPk();
-  }, []);
+    const defaultJwkString = JSON.stringify(defaultJwk, null, 2);
+    setJwkInput(defaultJwkString);
+    validateAndSetUserPk(defaultJwkString);
+  }, [validateAndSetUserPk]);
+
+  const handleInputChange = (value: string) => {
+    setJwkInput(value);
+    validateAndSetUserPk(value);
+  };
 
   return (
     <div className="section">
@@ -72,53 +89,27 @@ const UserPkSection: React.FC<Props> = ({ userPk, onUserPkChange, t }) => {
 
       <div className="section-content">
         <div className="input-group">
-          <label>{t.userSk}:</label>
-          <div className="input-with-button">
-            <input
-              type="text"
-              value={userSk}
-              onChange={(e) => setUserSk(e.target.value)}
-              placeholder="0x0a5bce2449b1632f3d1e4f96c095baa811040e17e7a7e84fb5ce8a0cad76f0e6"
-            />
-            <button onClick={generateRandomUserSk} className="small-button">
-              Random
-            </button>
-          </div>
-        </div>
-
-        <div className="input-group">
-          <label>{t.devicePk}:</label>
-          <input
-            type="text"
-            value={devicePk}
-            onChange={(e) => setDevicePk(e.target.value)}
-            placeholder="0x04421b4d7531a4adad4d1d2215af6a35fb6c509c9f54eab216ec6bd2420aff0e76e04f5676847feff5748a47b07b9e5bb3963df79c5d1cb41ab2aed04c0d9ef5a6"
+          <label>{t.userPkInput}:</label>
+          <textarea
+            value={jwkInput}
+            onChange={(e) => handleInputChange(e.target.value)}
+            placeholder={JSON.stringify(defaultJwk, null, 2)}
+            rows={6}
+            style={{
+              fontFamily: 'monospace',
+              fontSize: '14px',
+              width: '100%',
+              resize: 'vertical'
+            }}
           />
-        </div>
-
-        <div className="input-group">
-          <label>{t.context}:</label>
-          <input
-            type="text"
-            value={context}
-            onChange={(e) => setContext(e.target.value)}
-            placeholder="https://issuer.example"
-          />
+          {error && (
+            <div style={{ color: 'red', fontSize: '14px', marginTop: '5px' }}>
+              {error}
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="generate-section">
-        <button onClick={generateUserPk} className="generate-button">
-          {t.generateUserPk}
-        </button>
-      </div>
-
-      {userPk && (
-        <div className="current-userpk">
-          <label>{t.currentUserPk}:</label>
-          <pre className="userpk-output">{userPkJwk}</pre>
-        </div>
-      )}
     </div>
   );
 };
