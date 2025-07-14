@@ -323,7 +323,7 @@ textarea.json-input {
 
 /* Output Displays */
 .jwk-output, .key-output, .json-preview, .result-output, 
-.patched-json, .jwp-output, .jwp-formatted-output {
+.patched-json, .jwp-output, .jwp-formatted-output, .userpk-output {
   background-color: #f8f9fa;
   border: 1px solid #e9ecef;
   border-radius: 4px;
@@ -335,25 +335,7 @@ textarea.json-input {
   white-space: pre-wrap;
   word-break: break-all;
   color: #212529;
-  min-height: 150px;
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-/* User public key output with reduced height */
-.userpk-output {
-  background-color: #f8f9fa;
-  border: 1px solid #e9ecef;
-  border-radius: 4px;
-  padding: 15px;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-  font-size: 14px;
-  line-height: 1.5;
-  overflow-x: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-  color: #212529;
-  min-height: auto;
+  min-height: 50px;
   max-height: 400px;
   overflow-y: auto;
 }

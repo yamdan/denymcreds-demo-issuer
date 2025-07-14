@@ -10,9 +10,13 @@ interface Props {
 
 const UserPkSection: React.FC<Props> = ({ userPk, onUserPkChange, t }) => {
   const [userSk, setUserSk] = useState<string>('0x0a5bce2449b1632f3d1e4f96c095baa811040e17e7a7e84fb5ce8a0cad76f0e6');
-  const [devicePkX, setDevicePkX] = useState<string>('0x421b4d7531a4adad4d1d2215af6a35fb6c509c9f54eab216ec6bd2420aff0e76');
-  const [devicePkY, setDevicePkY] = useState<string>('0xe04f5676847feff5748a47b07b9e5bb3963df79c5d1cb41ab2aed04c0d9ef5a6');
+  const [devicePk, setDevicePk] = useState<string>('0x04421b4d7531a4adad4d1d2215af6a35fb6c509c9f54eab216ec6bd2420aff0e76e04f5676847feff5748a47b07b9e5bb3963df79c5d1cb41ab2aed04c0d9ef5a6');
   const [context, setContext] = useState<string>('https://issuer.example');
+
+  const userPkJwk = userPk ? JSON.stringify({
+    kty: 'oct',
+    k: userPk,
+  }, null, 2) : '';
 
   const generateRandomUserSk = () => {
     const randomSk = genUsk();
@@ -34,20 +38,23 @@ const UserPkSection: React.FC<Props> = ({ userPk, onUserPkChange, t }) => {
 
   const generateUserPk = () => {
     try {
+      const pkHex = devicePk.startsWith('0x04') ? devicePk.slice(4) : devicePk.replace(/^0x/, '');
+      const devicePkX = pkHex.slice(0, 64);
+      const devicePkY = pkHex.slice(64, 128);
       // Parse device public key
-      const devicePk: PublicKey = {
+      const devicePkParsed: PublicKey = {
         x: parseHexToNumberArray(devicePkX),
         y: parseHexToNumberArray(devicePkY)
       };
 
       // Generate user public key
-      const result = genUpk(userSk, devicePk, context);
-      
+      const result = genUpk(userSk, devicePkParsed, context);
+
       // Convert to base64url format
       const userPkHex = result.userPk.toString(16).padStart(64, '0');
       const userPkBytes = new Uint8Array(userPkHex.match(/.{2}/g)!.map(byte => parseInt(byte, 16)));
       const userPkB64 = base64urlEncode(userPkBytes);
-      
+
       onUserPkChange(userPkB64);
     } catch (error) {
       alert(`Error generating user PK: ${error}`);
@@ -62,7 +69,7 @@ const UserPkSection: React.FC<Props> = ({ userPk, onUserPkChange, t }) => {
   return (
     <div className="section">
       <h2>{t.userPkSection}</h2>
-      
+
       <div className="section-content">
         <div className="input-group">
           <label>{t.userSk}:</label>
@@ -79,29 +86,14 @@ const UserPkSection: React.FC<Props> = ({ userPk, onUserPkChange, t }) => {
           </div>
         </div>
 
-        <div className="device-pk-container">
-          <h3>{t.devicePk}</h3>
-          <div className="device-pk-inputs">
-            <div className="input-group">
-              <label>{t.devicePkX}:</label>
-              <input
-                type="text"
-                value={devicePkX}
-                onChange={(e) => setDevicePkX(e.target.value)}
-                placeholder="0x421b4d7531a4adad4d1d2215af6a35fb6c509c9f54eab216ec6bd2420aff0e76"
-              />
-            </div>
-
-            <div className="input-group">
-              <label>{t.devicePkY}:</label>
-              <input
-                type="text"
-                value={devicePkY}
-                onChange={(e) => setDevicePkY(e.target.value)}
-                placeholder="0xe04f5676847feff5748a47b07b9e5bb3963df79c5d1cb41ab2aed04c0d9ef5a6"
-              />
-            </div>
-          </div>
+        <div className="input-group">
+          <label>{t.devicePk}:</label>
+          <input
+            type="text"
+            value={devicePk}
+            onChange={(e) => setDevicePk(e.target.value)}
+            placeholder="0x04421b4d7531a4adad4d1d2215af6a35fb6c509c9f54eab216ec6bd2420aff0e76e04f5676847feff5748a47b07b9e5bb3963df79c5d1cb41ab2aed04c0d9ef5a6"
+          />
         </div>
 
         <div className="input-group">
@@ -124,7 +116,7 @@ const UserPkSection: React.FC<Props> = ({ userPk, onUserPkChange, t }) => {
       {userPk && (
         <div className="current-userpk">
           <label>{t.currentUserPk}:</label>
-          <pre className="userpk-output">{userPk}</pre>
+          <pre className="userpk-output">{userPkJwk}</pre>
         </div>
       )}
     </div>
