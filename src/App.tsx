@@ -85,16 +85,16 @@ function App() {
             t={t}
           />
           
-          <HeaderSection 
-            header={header}
-            onHeaderChange={setHeader}
-            t={t}
-          />
-          
           <UserPkSection 
             userPk={userPk}
             onUserPkChange={setUserPk}
             header={header}
+            t={t}
+          />
+          
+          <HeaderSection 
+            header={header}
+            onHeaderChange={setHeader}
             t={t}
           />
           

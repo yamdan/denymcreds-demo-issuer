@@ -141,9 +141,9 @@ textarea.json-input {
   padding: 10px;
   line-height: 1.5;
   min-height: 60px;
-  max-height: 80px;
   border: 1px solid #ced4da;
   border-radius: 4px;
+  word-break: break-all;
 }
 
 .input-section textarea {
@@ -154,7 +154,6 @@ textarea.json-input {
   padding: 10px;
   line-height: 1.5;
   min-height: 60px;
-  max-height: 80px;
   border: 1px solid #ced4da;
   border-radius: 4px;
   background-color: #ffffff;

@@ -74,7 +74,7 @@ const translations: Record<Language, Translations> = {
     subtitle: 'JWP (JSON Web Proof) 風の証明書発行のデモ',
     
     // Sections
-    issuerKeySection: 'Issuer鍵',
+    issuerKeySection: 'Issuer秘密鍵',
     headerSection: 'ヘッダー',
     userPkSection: 'ユーザー公開鍵',
     payloadSection: 'ペイロード',

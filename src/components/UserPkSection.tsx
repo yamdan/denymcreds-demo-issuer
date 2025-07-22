@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import TextareaAutosize from 'react-textarea-autosize';
 import { type Translations } from '../utils/i18n';
 
 interface Props {
@@ -90,18 +91,11 @@ const UserPkSection: React.FC<Props> = ({ onUserPkChange, header, t }) => {
       <div className="section-content">
         <div className="input-group">
           <label>{t.userPkInput}:</label>
-          <textarea
+          <TextareaAutosize
             value={jwkInput}
             onChange={(e) => handleInputChange(e.target.value)}
             placeholder={JSON.stringify(defaultJwk, null, 2)}
-            rows={8}
             className="json-input"
-            style={{
-              fontSize: '14px',
-              width: '100%',
-              resize: 'vertical',
-              minHeight: '140px'
-            }}
           />
           {error && (
             <div style={{ color: 'red', fontSize: '14px', marginTop: '5px' }}>
@@ -110,7 +104,6 @@ const UserPkSection: React.FC<Props> = ({ onUserPkChange, header, t }) => {
           )}
         </div>
       </div>
-
     </div>
   );
 };

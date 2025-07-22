@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { type Translations } from '../utils/i18n';
+import TextareaAutosize from 'react-textarea-autosize';
 
 interface Props {
   header: string;
@@ -22,8 +23,8 @@ const HeaderSection: React.FC<Props> = ({ header, onHeaderChange, t }) => {
   const formatJson = () => {
     try {
       const parsed = JSON.parse(header);
-      const formatted = autoRemoveWhitespace 
-        ? JSON.stringify(parsed) 
+      const formatted = autoRemoveWhitespace
+        ? JSON.stringify(parsed)
         : JSON.stringify(parsed, null, 2);
       setFormattedHeader(formatted);
       if (autoRemoveWhitespace) {
@@ -44,7 +45,7 @@ const HeaderSection: React.FC<Props> = ({ header, onHeaderChange, t }) => {
   return (
     <div className="section">
       <h2>{t.headerSection}</h2>
-      
+
       <div className="header-controls">
         <label className="checkbox-label">
           <input
@@ -58,10 +59,9 @@ const HeaderSection: React.FC<Props> = ({ header, onHeaderChange, t }) => {
 
       <div className="input-section">
         <label>{t.jsonInput}:</label>
-        <textarea
+        <TextareaAutosize
           value={header}
           onChange={(e) => handleHeaderChange(e.target.value)}
-          rows={2}
           className="json-input"
           placeholder='{"alg":"ZK-ES256","typ":"JPT","iss":"https://issuer.example","kid":"1"}'
         />

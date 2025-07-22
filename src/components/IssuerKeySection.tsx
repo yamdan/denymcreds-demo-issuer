@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import elliptic from 'elliptic';
+import TextareaAutosize from 'react-textarea-autosize';
 import { genKey, base64urlEncode } from '../utils/sign';
 import { type Translations } from '../utils/i18n';
 
@@ -26,7 +27,7 @@ const IssuerKeySection: React.FC<Props> = ({ issuerSk, onIssuerSkChange, t }) =>
     try {
       const keyPair = ec.keyFromPrivate(privateKeyNumbers);
       const publicKey = keyPair.getPublic();
-      
+
       const jwkObj = {
         kty: 'EC',
         crv: 'P-256',
@@ -35,7 +36,7 @@ const IssuerKeySection: React.FC<Props> = ({ issuerSk, onIssuerSkChange, t }) =>
         d: base64urlEncode(new Uint8Array(privateKeyNumbers)),
         kid: '1',
       };
-      
+
       setJwk(JSON.stringify(jwkObj, null, 2));
     } catch (error) {
       console.error('JWK generation error:', error);
@@ -45,7 +46,7 @@ const IssuerKeySection: React.FC<Props> = ({ issuerSk, onIssuerSkChange, t }) =>
   const parseManualInput = useCallback(() => {
     try {
       let privateKeyNumbers: number[];
-      
+
       if (manualFormat === 'hex') {
         // Remove 0x prefix if present and parse hex string
         const cleanHex = manualInput.replace(/^0x/, '');
@@ -119,7 +120,7 @@ const IssuerKeySection: React.FC<Props> = ({ issuerSk, onIssuerSkChange, t }) =>
   return (
     <div className="section">
       <h2>{t.issuerKeySection}</h2>
-      
+
       <div className="mode-selector">
         <label>
           <input
@@ -171,18 +172,17 @@ const IssuerKeySection: React.FC<Props> = ({ issuerSk, onIssuerSkChange, t }) =>
               {t.numberArrayFormat}
             </label>
           </div>
-          
+
           <div className="input-section">
             <label>{t.privateKeyInput}:</label>
-            <textarea
+            <TextareaAutosize
               value={manualInput}
               onChange={(e) => setManualInput(e.target.value)}
               placeholder={
-                manualFormat === 'hex' 
-                  ? '576e3f0b4ddb56634...' 
+                manualFormat === 'hex'
+                  ? '576e3f0b4ddb56634...'
                   : '[0x57, 0x6e, 0x3f, 0x0b, ...]'
               }
-              rows={2}
               className="json-input"
             />
             <button onClick={parseManualInput} className="parse-button">
@@ -195,13 +195,13 @@ const IssuerKeySection: React.FC<Props> = ({ issuerSk, onIssuerSkChange, t }) =>
       {jwk && (
         <div className="jwk-display">
           <label>{t.jwkDisplay}:</label>
-          <pre className="jwk-output" style={{ 
+          <pre className="jwk-output" style={{
             position: 'relative',
             boxSizing: 'border-box'
           }}>
             {jwk}
-            <button 
-              onClick={copyToClipboard} 
+            <button
+              onClick={copyToClipboard}
               className="copy-icon-button"
               style={{
                 position: 'absolute',
