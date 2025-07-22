@@ -36,7 +36,7 @@ function App() {
 
     setIsGenerating(true);
     try {
-      const pairs: (string | number)[][] = payloadPairs.map(pair => [pair.path, pair.value]);
+      const pairs: unknown[][] = payloadPairs.map(pair => [pair.path, pair.value]);
       const result = await issueJwp(issuerSk, header, userPk, pairs);
       setJwpResult(result);
     } catch (error) {

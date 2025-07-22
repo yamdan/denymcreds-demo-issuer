@@ -154,20 +154,20 @@ export async function signUtf8(userSk: number[], utf8String: string): Promise<Si
   return signCore(userSk, hash);
 }
 
-function hashJsonValue(value: string | number): bigint {
+function hashJsonValue(value: unknown): bigint {
   if (typeof value === 'string') {
     return hashUtf8ToField(value);
   } else if (typeof value === 'number') {
     return BigInt(value);
   }
-  throw new Error('Unsupported value type for hashing');
+  throw new Error(`Unsupported value type for hashing: ${typeof value}`);
 }
 
 export async function issueJwp(
   issuerSk: number[],
   header: string,
   userPk: string,
-  pairs: (string | number)[][]
+  pairs: unknown[][]
 ): Promise<string> {
   const headerB64 = base64urlEncode(header);
   const headerField = hashUtf8ToField(headerB64);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { applyJsonPatch } from '../utils/json-patch';
+import { applyJsonPatch, parseValue, type JsonValue } from '../utils/json-patch';
 import { type PayloadPair } from '../App';
 import { type Translations } from '../utils/i18n';
 
@@ -20,7 +20,7 @@ const PayloadSection: React.FC<Props> = ({ pairs, onPairsChange, header, t }) =>
   const updatePatchedJson = () => {
     try {
       const headerObj = JSON.parse(header);
-      const patchPairs: [string, string | number][] = pairs.map(pair => [pair.path, pair.value]);
+      const patchPairs: [string, JsonValue][] = pairs.map(pair => [pair.path, pair.value]);
       const patched = applyJsonPatch(headerObj, patchPairs);
       setPatchedJson(JSON.stringify(patched, null, 2));
     } catch (error) {
@@ -38,27 +38,21 @@ const PayloadSection: React.FC<Props> = ({ pairs, onPairsChange, header, t }) =>
     onPairsChange(newPairs);
   };
 
-  const updatePair = (index: number, field: 'path' | 'value', value: string | number) => {
+  const updatePair = (index: number, field: 'path' | 'value', value: string) => {
     const newPairs = [...pairs];
-    newPairs[index] = { ...newPairs[index], [field]: value };
+    if (field === 'value') {
+      // 値の場合は parseValue を使用して適切な型に変換
+      newPairs[index] = { ...newPairs[index], [field]: parseValue(value) };
+    } else {
+      newPairs[index] = { ...newPairs[index], [field]: value };
+    }
     onPairsChange(newPairs);
-  };
-
-  const parseValue = (value: string): string | number => {
-    // Try to parse as number if it looks like a number
-    if (/^\d+$/.test(value)) {
-      return parseInt(value, 10);
-    }
-    if (/^\d+\.\d+$/.test(value)) {
-      return parseFloat(value);
-    }
-    return value;
   };
 
   return (
     <div className="section">
       <h2>{t.payloadSection}</h2>
-      
+
       <div className="payload-container">
         <div className="payload-input">
           <div className="pairs-list">
@@ -74,19 +68,22 @@ const PayloadSection: React.FC<Props> = ({ pairs, onPairsChange, header, t }) =>
                       placeholder="/given_name"
                     />
                   </div>
-                  
+
                   <div className="input-group">
                     <label>{t.value}:</label>
                     <input
                       type="text"
-                      value={pair.value.toString()}
-                      onChange={(e) => updatePair(index, 'value', parseValue(e.target.value))}
+                      value={typeof pair.value === 'object' && pair.value !== null
+                        ? JSON.stringify(pair.value)
+                        : String(pair.value ?? '')
+                      }
+                      onChange={(e) => updatePair(index, 'value', e.target.value)}
                       placeholder="太郎"
                     />
                   </div>
                 </div>
-                
-                <button 
+
+                <button
                   onClick={() => removePair(index)}
                   className="remove-button"
                   disabled={pairs.length <= 1}
@@ -96,7 +93,7 @@ const PayloadSection: React.FC<Props> = ({ pairs, onPairsChange, header, t }) =>
               </div>
             ))}
           </div>
-          
+
           <button onClick={addPair} className="add-button">
             {t.addPair}
           </button>
