@@ -16,7 +16,7 @@ export interface PayloadPair {
 function App() {
   const [language, setLanguage] = useState<Language>('ja');
   const [issuerSk, setIssuerSk] = useState<number[]>([]);
-  const [header, setHeader] = useState<string>('{"alg":"ZK-ES256","typ":"JPT","iss":"https://issuer.example","kid":"1"}');
+  const [header, setHeader] = useState<string>('{"alg":"DENYM-ES256","typ":"JPT","iss":"https://issuer.example","kid":"1"}');
   const [userPk, setUserPk] = useState<string>('');
   const [payloadPairs, setPayloadPairs] = useState<PayloadPair[]>([
     { path: '/given_name', value: '太郎' },

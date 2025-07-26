@@ -63,7 +63,7 @@ const HeaderSection: React.FC<Props> = ({ header, onHeaderChange, t }) => {
           value={header}
           onChange={(e) => handleHeaderChange(e.target.value)}
           className="json-input"
-          placeholder='{"alg":"ZK-ES256","typ":"JPT","iss":"https://issuer.example","kid":"1"}'
+          placeholder='{"alg":"DENYM-ES256","typ":"JPT","iss":"https://issuer.example","kid":"1"}'
         />
       </div>
 
