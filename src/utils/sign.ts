@@ -65,7 +65,7 @@ export function base64urlEncode(input: string | number | Uint8Array): string {
   } else {
     buf = new Uint8Array(input);
   }
-  
+
   const base64 = btoa(String.fromCharCode(...buf));
   return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
@@ -154,7 +154,7 @@ export async function signUtf8(userSk: number[], utf8String: string): Promise<Si
   return signCore(userSk, hash);
 }
 
-function hashJsonValue(value: unknown): bigint {
+function hashJsonValue(value: string | number): bigint {
   if (typeof value === 'string') {
     return hashUtf8ToField(value);
   } else if (typeof value === 'number') {
@@ -167,15 +167,20 @@ export async function issueJwp(
   issuerSk: number[],
   header: string,
   userPk: string,
-  pairs: unknown[][]
+  iat: number,
+  exp: number,
+  disclosablePayloads: [string, string | number][]
 ): Promise<string> {
   const headerB64 = base64urlEncode(header);
   const headerField = hashUtf8ToField(headerB64);
 
-  const payloadB64 = pairs.map((pair) => `${base64urlEncode(JSON.stringify(pair))}`).join('~');
+  const iatPayload = ["/iat", iat];
+  const expPayload = ["/exp", exp];
+  const payloads = [iatPayload, expPayload].concat(disclosablePayloads);
+  const payloadB64 = payloads.map((payload) => `${base64urlEncode(JSON.stringify(payload))}`).join('~');
 
-  const pairsField = pairs.map((pair) => pair.map(hashJsonValue));
-  const leaves = pairsField.map((pair) => poseidon2(pair));
+  const disclosablePayloadsField = disclosablePayloads.map((payload) => payload.map(hashJsonValue));
+  const leaves = disclosablePayloadsField.map((payloadField) => poseidon2(payloadField));
 
   const pad = poseidon2([0, 0]);
   const nextPow2 = (n: number): number => 1 << (32 - Math.clz32(n - 1));
@@ -202,8 +207,12 @@ export async function issueJwp(
   const userPkBytes = Uint8Array.from(atob(userPkDecoded), c => c.charCodeAt(0));
   const userPkBigint = BigInt(`0x${Array.from(userPkBytes).map(b => b.toString(16).padStart(2, '0')).join('')}`);
 
+  // Get iat and exp
+  const iatBigInt = BigInt(iat);
+  const expBigInt = BigInt(exp);
+
   // SHA256
-  const toBeHashed = poseidon2([poseidon2([headerField, userPkBigint]), root]);
+  const toBeHashed = poseidon2([poseidon2([poseidon2([poseidon2([headerField, userPkBigint]), root]), iatBigInt]), expBigInt]); // WIP
   const toBeHashedHex = toBeHashed.toString(16).padStart(64, '0');
   const toBeHashedBytes = new Uint8Array(toBeHashedHex.match(/.{2}/g)!.map(byte => parseInt(byte, 16)));
   const toBeSigned = await sha256Hash(toBeHashedBytes);

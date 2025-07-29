@@ -7,21 +7,27 @@ interface Props {
   pairs: PayloadPair[];
   onPairsChange: (pairs: PayloadPair[]) => void;
   header: string;
+  iat: number;
+  onIatChange: (iat: number) => void;
+  exp: number;
+  onExpChange: (exp: number) => void;
   t: Translations;
 }
 
-const PayloadSection: React.FC<Props> = ({ pairs, onPairsChange, header, t }) => {
+const PayloadSection: React.FC<Props> = ({ pairs, onPairsChange, header, iat, onIatChange, exp, onExpChange, t }) => {
   const [patchedJson, setPatchedJson] = useState<string>('');
 
   useEffect(() => {
     updatePatchedJson();
-  }, [pairs, header]);
+  }, [pairs, header, iat, exp]);
 
   const updatePatchedJson = () => {
     try {
       const headerObj = JSON.parse(header);
+      const iatAndExp: [string, JsonValue][] = [["/iat", iat], ["/exp", exp]];
       const patchPairs: [string, JsonValue][] = pairs.map(pair => [pair.path, pair.value]);
-      const patched = applyJsonPatch(headerObj, patchPairs);
+      const payloads = iatAndExp.concat(patchPairs);
+      const patched = applyJsonPatch(headerObj, payloads);
       setPatchedJson(JSON.stringify(patched, null, 2));
     } catch (error) {
       setPatchedJson(`Error: ${error}`);
@@ -36,6 +42,24 @@ const PayloadSection: React.FC<Props> = ({ pairs, onPairsChange, header, t }) =>
   const removePair = (index: number) => {
     const newPairs = pairs.filter((_, i) => i !== index);
     onPairsChange(newPairs);
+  };
+
+  const updateIat = (value: string) => {
+    const newIat = parseValue(value);
+    if (typeof newIat === 'number') {
+      onIatChange(newIat);
+    } else {
+      alert(t.invalidIat);
+    }
+  };
+
+  const updateExp = (value: string) => {
+    const newExp = parseValue(value);
+    if (typeof newExp === 'number') {
+      onExpChange(newExp);
+    } else {
+      alert(t.invalidExp);
+    }
   };
 
   const updatePair = (index: number, field: 'path' | 'value', value: string) => {
@@ -56,6 +80,51 @@ const PayloadSection: React.FC<Props> = ({ pairs, onPairsChange, header, t }) =>
       <div className="payload-container">
         <div className="payload-input">
           <div className="pairs-list">
+            <div key="iat" className="pair-row">
+              <div className="pair-inputs">
+                <div className="input-group">
+                  <label>{t.path}:</label>
+                  <input
+                    type="text"
+                    value="/iat"
+                    readOnly
+                    className="readonly-input"
+                  />
+                </div>
+                <div className="input-group">
+                  <label>{t.value}:</label>
+                  <input
+                    type="text"
+                    value={iat}
+                    onChange={(e) => updateIat(e.target.value)}
+                    placeholder="例: 1633036800"
+                  />
+                </div>
+              </div>
+            </div>
+            <div key="exp" className="pair-row">
+              <div className="pair-inputs">
+                <div className="input-group">
+                  <label>{t.path}:</label>
+                  <input
+                    type="text"
+                    value="/exp"
+                    readOnly
+                    className="readonly-input"
+                  />
+                </div>
+                <div className="input-group">
+                  <label>{t.value}:</label>
+                  <input
+                    type="text"
+                    value={exp}
+                    onChange={(e) => updateExp(e.target.value)}
+                    placeholder="例: 1664572800"
+                  />
+                </div>
+              </div>
+            </div>
+
             {pairs.map((pair, index) => (
               <div key={index} className="pair-row">
                 <div className="pair-inputs">

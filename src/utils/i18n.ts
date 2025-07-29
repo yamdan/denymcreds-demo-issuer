@@ -47,6 +47,8 @@ export interface Translations {
   value: string;
   jsonPatchPreview: string;
   patchedJson: string;
+  invalidIat: string;
+  invalidExp: string;
   
   // Result Section
   generateJwp: string;
@@ -115,6 +117,8 @@ const translations: Record<Language, Translations> = {
     value: '値',
     jsonPatchPreview: 'JSON Patch適用後プレビュー',
     patchedJson: '',
+    invalidIat: '無効なiat値です',
+    invalidExp: '無効なexp値です',
     
     // Result Section
     generateJwp: 'JWP生成',
@@ -182,6 +186,8 @@ const translations: Record<Language, Translations> = {
     value: 'Value',
     jsonPatchPreview: 'JSON Patch Preview',
     patchedJson: 'Patched JSON',
+    invalidIat: 'Invalid iat value',
+    invalidExp: 'Invalid exp value',
     
     // Result Section
     generateJwp: 'Generate JWP',
