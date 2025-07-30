@@ -99,6 +99,18 @@ const PayloadSection: React.FC<Props> = ({ pairs, onPairsChange, header, iat, on
                     onChange={(e) => updateIat(e.target.value)}
                     placeholder="例: 1633036800"
                   />
+                  <span className="date-preview">
+                    {new Date(iat * 1000).toLocaleString(
+                      undefined,
+                      {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                      })}
+                  </span>
                 </div>
               </div>
             </div>
@@ -121,6 +133,18 @@ const PayloadSection: React.FC<Props> = ({ pairs, onPairsChange, header, iat, on
                     onChange={(e) => updateExp(e.target.value)}
                     placeholder="例: 1664572800"
                   />
+                  <span className="date-preview">
+                    {new Date(exp * 1000).toLocaleString(
+                      undefined,
+                      {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                      })}
+                  </span>
                 </div>
               </div>
             </div>
