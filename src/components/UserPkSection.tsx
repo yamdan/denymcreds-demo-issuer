@@ -16,10 +16,11 @@ interface UserPkJwk {
 }
 
 // Default JWK example (moved outside component to avoid recreating on each render)
+const defaultContext = `${window.location.origin}${window.location.pathname}`;
 const defaultJwk = {
   kty: "nym",
   k: "FO0qROb_uMlNMAjLcar9ikfMcEuX30cVBKD5Fgxy710",
-  c: "https://issuer.example"
+  c: defaultContext
 };
 
 const UserPkSection: React.FC<Props> = ({ onUserPkChange, header, t }) => {

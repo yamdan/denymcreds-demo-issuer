@@ -14,9 +14,16 @@ export interface PayloadPair {
 }
 
 function App() {
+  const defaultIss = `${window.location.origin}${window.location.pathname}`;
   const [language, setLanguage] = useState<Language>('ja');
   const [issuerSk, setIssuerSk] = useState<number[]>([]);
-  const [header, setHeader] = useState<string>('{"alg":"DENYM-ES256","typ":"JPT","iss":"https://issuer.example","kid":"1"}');
+  const [header, setHeader] = useState<string>(
+    JSON.stringify({
+      alg: 'DENYM-ES256',
+      typ: 'JPT',
+      iss: defaultIss,
+      kid: '1'
+    }));
   const [userPk, setUserPk] = useState<string>('');
   const [iat, setIat] = useState<number>(Math.floor(Date.now() / 1000));
   const [exp, setExp] = useState<number>(Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 365); // 1 year expiration
